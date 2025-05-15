@@ -4,191 +4,200 @@ const char* htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
 <!DOCTYPE html>
 <html>
   <head>
-  <meta name="viewport" content="width=device-width, initial-scale=.9, maximum-scale=1, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=.8, maximum-scale=1, user-scalable=no">
   <style>
-    .arrows {
-      font-size:50px;
-      color:grey;
-    }
-    td.button {
-      background-color:black;
-      border-radius:20%;
-      box-shadow: 5px 5px #888888;
-    }
-    td.button:active {
-      transform: translate(5px,5px);
-      box-shadow: none; 
-    }
-    .auxButton {
-  background-color: black; /* Background color of the button */
-  box-shadow: 5px 5px #888888;
-  color: grey; /* Text color */
-  padding: 30px 35px; /* Padding for the button */
-  border: none; /* Remove the button border */
-  border-radius: 20%; /* Rounded corners */
-  font-size: 24px; /* Font size */
-  cursor: pointer; /* Cursor style on hover */
-  transform: rotate(90deg); /* Rotate the text vertically */
-  transform-origin: left center; /* Adjust the origin to change the rotation pivot */
-  margin-left: 60px;
-  margin-top: 55px;
+body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+  overflow: hidden;
+  font-family: sans-serif;
 }
-    .auxButton:active {
-      transform: translate(-5px,5px);
-      transform: rotate(90deg); /* Rotate the text vertically */
-      transform-origin: left center;
-      
-      box-shadow: none; 
-    }
 
-    .noselect {
-      -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-         -khtml-user-select: none; /* Konqueror HTML */
-           -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-                user-select: none; /* Non-prefixed version, currently
-                                      supported by Chrome and Opera */
-    }
-        .slidecontainer {
-      width: 100%;
-    }
+h1 {
+  margin: 10px 0 0 0;
+  font-size: 1.8em;
+  text-align: center;
+  color: white;
+}
 
-    .slider {
-      -webkit-appearance: none;
-      width: 150%;
-      height: 20px;
-      border-radius: 5px;
-      background: #d3d3d3;
-      outline: none;
-      opacity: 0.7;
-      -webkit-transition: .2s;
-      transition: opacity .2s;
-    }
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
-    .slider:hover {
-      opacity: 1;
-    }
-  
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 65px;
-      height: 65px;
-      border-radius: 50%;
-      background: red;
-      cursor: pointer;
-    }
+/*Throttle slider top center*/
+.top-center {
+  display: flex;
+  justify-content: center;
+  padding: 10px 10px 30px 10px;
+}
 
-    .slider::-moz-range-thumb {
-      width: 60px;
-      height: 40px;
-      border-radius: 50%;
-      background: red;
-      cursor: pointer;
-    }
+.slidecontainer {
+  width: 90%;
+}
 
-.vertical-slider-container {
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 60px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+}
+
+.bottom-controls {
+  position: fixed;
+  bottom: 120px;
+  left: 60px;
+}
+
+.aux-steering-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0px; /* Gap between steering buttons and slider*/
+}
+
+.aux-buttons {
   display: flex;
   flex-direction: column;
+  gap: 85px;
+  align-items: flex-start;
+}
+
+.auxButton {
+  background-color: white;
+  box-shadow: 5px 5px #888888;
+  color: grey;
+  padding: 30px 35px;
+  border: none;
+  border-radius: 20%;
+  font-size: 24px;
+  cursor: pointer;
+  transform: rotate(90deg);
+  transform-origin: left center;
+  width: 150px;
+}
+
+.auxButton:active {
+  transform: translate(-5px, 5px) rotate(90deg);
+  transform-origin: left center;
+  box-shadow: none;
+}
+
+
+.vertical-slider-container {
+  height: 250px;
+  display: flex;
   align-items: center;
-  margin-top: 165px;
-  width: 5px; /* Adjust the width as needed */
-  height: 100px; /* Adjust the height as needed */
+  justify-content: center;
 }
 
 .vertical-slider {
-  writing-mode: bt-lr; /* IE/Edge specific property for vertical text */
-  -webkit-appearance: none;
-  width: 400px;
-  height: 20px;
+  writing-mode: bt-lr;
   transform: rotate(270deg);
-     background: #d3d3d3; /* Background color of the slider */
-        outline: none;
-      opacity: 0.7;
-      -webkit-transition: .2s;
-      transition: opacity .2s;
+  width: 250px;
+  height: 20px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
 .vertical-slider:hover {
-      opacity: 1;
-    }
-.vertical-slider::-webkit-slider-thumb {
-        -webkit-appearance: none;
-      appearance: none;
-  width: 65px; /* Adjust the width to make the slider thumb thicker */
-  height: 65px; /* Adjust the height to make the slider thumb thicker */
-  background-color: red; /* Background color of the slider thumb */
-  border: none; /* Remove the default border */
-  //margin-top: -5px; /* Center the thumb vertically within the track */
+  opacity: 1;
 }
-    .vertical-slider::-moz-range-thumb {
-      width: 60px;
-      height: 40px;
-      border-radius: 50%;
-      background: red;
-      cursor: pointer;
-    }
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 65px;
+  height: 65px;
+  background-color: red;
+  border: none;
+  cursor: pointer;
+}
+
+.vertical-slider::-moz-range-thumb {
+  width: 60px;
+  height: 40px;
+  border-radius: 50%;
+  background: red;
+  cursor: pointer;
+}
+
 
     </style>
   
   </head>
-  <body class="noselect" align="center" style="background-color:white; overflow: hidden;" >
-    <h1 style="color: black; text-align:center;">MINI-FORK</h1>
-    
-    <table id="mainTable" style="width:400px;margin:auto;table-layout:fixed" CELLSPACING=10>
-    <tr>
-        <td colspan=2 style="text-align: center;">
-         <div class="slidecontainer">
-            <input type="range" min="-255" max="255" value="0" class="slider" id="throttle" oninput='sendButtonInput("throttle",value)' ontouchend='resetSlider("throttle")'>
-          </div>
-        </td>
-      </tr>  
-      <tr/>
-      <tr/>
-      <tr/><tr/>
-      <tr>
-        <td class="button"
-    ontouchstart='sendButtonInput("mast", "5")'
-    onmousedown='sendButtonInput("mast", "5")'
-    ontouchend='sendButtonInput("mast", "0")'
-    onmouseup='sendButtonInput("mast", "0")'>
-    <span class="arrows">&#8678;</span></td>
-        <td class="button" ontouchstart='sendButtonInput("light","6")'onmousedown='sendButtonInput("light","6")'onmouseup='sendButtonInput("MoveCar","0")' ontouchend='sendButtonInput("MoveCar","0")'><span class="arrows" >&#9788;</span></td>   
-        <td class="button"
-    ontouchstart='sendButtonInput("mast", "6")'
-    onmousedown='sendButtonInput("mast", "6")'
-    ontouchend='sendButtonInput("mast", "0")'
-    onmouseup='sendButtonInput("mast", "0")'>
-    <span class="arrows">&#8680;</span></td>
-      </tr>
-      <tr/>
-      <tr/>
-      <tr/><tr/>
-<tr>
-  <td style="text-align: left; font-size: 25px"><b></b></td>
-  <td>
-    <div class="vertical-slider-container">
-      <input type="range" min="40" max="132" value="86" class="vertical-slider" id="steering" oninput='sendButtonInput("steering", value)'ontouchend='resetSlider("steering")'>
+<body class="noselect">
+  <h1>TableRacer 2</h1> <!-- customize Cart Name here too -->
+	<br/>
+	<br/>
+  <!-- Throttle-Slider under h1 -->
+  <div class="top-center">
+    <div class="slidecontainer">
+      <input type="range" min="40" max="132" value="86" class="slider" id="throttle"
+        oninput='sendButtonInput("throttle", value)' ontouchend='resetSlider("throttle")'>
     </div>
-  </td>
-  <td>
-    <button id="auxButton" class="auxButton"
-    ontouchstart='startSendingButtonInput("mTilt", "1")'
-    onmousedown='startSendingButtonInput("mTilt", "1")'
-    ontouchend='stopSendingButtonInput()'
-    onmouseup='stopSendingButtonInput()'>FTILT</button>
-    <button id="auxButton" class="auxButton"
-    ontouchstart='startSendingButtonInput("mTilt", "2")'
-    onmousedown='startSendingButtonInput("mTilt", "2")'
-    ontouchend='stopSendingButtonInput()'
-    onmouseup='stopSendingButtonInput()'>BTILT</button>
-</td>
-<tr/>
-<tr/>
-</tr>
-</tr>
-    </table>
+  </div>
+
+  <!-- controll surfaces bottom left -->
+  <div class="bottom-controls">
+    <div class="aux-steering-group">
+      <div class="aux-buttons">
+        <button class="auxButton"
+          ontouchstart='sendButtonInput("steering", "132")'
+          onmousedown='sendButtonInput("steering", "132")'
+          ontouchend='sendButtonInput("steering", "86")'
+          onmouseup='sendButtonInput("steering", "86")'>&#8678;LEFT</button>
+
+        <button class="auxButton"
+          ontouchstart='sendButtonInput("steering", "40")'
+          onmousedown='sendButtonInput("steering", "40")'
+          ontouchend='sendButtonInput("steering", "86")'
+          onmouseup='sendButtonInput("steering", "86")'>RIGHT&#8680;</button>
+      </div>
+
+      <div class="vertical-slider-container">
+        <input type="range" min="40" max="132" value="86" class="vertical-slider" id="steering"
+          oninput='sendButtonInput("steering", value)' ontouchend='resetSlider("steering")' disabled hidden>
+      </div>
+    </div>
+  </div>
+</body>
+
+
   
     <script>
       var webSocketCarInputUrl = "ws:\/\/" + window.location.hostname + "/CarInput";      
@@ -210,7 +219,8 @@ const char* htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
         websocketCarInput.onclose   = function(event){setTimeout(initCarInputWebSocket, 2000);};
         websocketCarInput.onmessage = function(event){};        
       }
-      
+
+
       function sendButtonInput(key, value) 
       {
        var data = key + "," + value;
@@ -222,103 +232,17 @@ const char* htmlHomePage PROGMEM = R"HTMLHOMEPAGE(
     sendButtonInput(action, value); // Send the initial input when the button is pressed
     intervalId = setInterval(function() {
         sendButtonInput(action, value); // Continuously send the input as long as the button is pressed
-    }, 10); // You can adjust the interval (in milliseconds) to control the rate of sending
+    }, 10); // You can adjust the interval (in milliseconds) to control the rate of sending 
     }
 
     function stopSendingButtonInput() {
     clearInterval(intervalId); // Stop sending the input when the button is released
 }
       function handleKeyDown(event) {
-        if (event.keyCode ===88)
-        {
-          sendButtonInput("light", "1");
-        }
-        if(event.keyCode == 74)
-        {
-          startSendingButtonInput("mTilt", "1");
-        }
-        if(event.keyCode == 76)
-        {
-          startSendingButtonInput("mTilt", "2");
-        }
-        if (event.keyCode === 73)
-        {
-          sendButtonInput("mast", "5");
-        }
-        if (event.keyCode === 75)
-        {
-          sendButtonInput("mast", "6");
-        }
-        if(event.keyCode === 87)
-        {
-          throttleSlider.value = parseInt(throttleSlider.value) + 255; // You can adjust the increment value as needed
-          sendButtonInput("throttle",throttleSlider.value);
-      // Trigger the 'input' event on the slider to update its value
-          throttleSlider.dispatchEvent(new Event('input'));
-        }
-        if(event.keyCode === 83)
-        {
-          throttleSlider.value = parseInt(throttleSlider.value) - 255; // You can adjust the increment value as needed
-          sendButtonInput("throttle",throttleSlider.value);
-      // Trigger the 'input' event on the slider to update its value
-          throttleSlider.dispatchEvent(new Event('input'));
-        }
-        if(event.keyCode === 65)
-        {
-          steeringSlider.value = 50; // You can adjust the increment value as needed
-          sendButtonInput("steering",50);
-      // Trigger the 'input' event on the slider to update its value
-          steeringSlider.dispatchEvent(new Event('input'));
-        }
-        if(event.keyCode === 68)
-        {
-          steeringSlider.value = 130; // You can adjust the increment value as needed
-          sendButtonInput("steering", 130);
-      // Trigger the 'input' event on the slider to update its value
-          steeringSlider.dispatchEvent(new Event('input'));
-        }
+        
         } 
       function handleKeyUp(event) {
-        if(event.keyCode == 74)
-        {
-          stopSendingButtonInput();
-        }
-        if(event.keyCode == 76)
-        {
-          stopSendingButtonInput();
-        }
-        if (event.keyCode === 73);
-        {
-          sendButtonInput("mast", "0");
-        }
-        if (event.keyCode === 75)
-        {
-          sendButtonInput("mast", "0");
-        }
-        if(event.keyCode === 87)
-        {
-          throttleSlider.value = 0; // You can adjust the increment value as needed
-          sendButtonInput("throttle",0);
-          throttleSlider.dispatchEvent(new Event('input'));
-          }
-        if(event.keyCode === 83)
-        {
-          throttleSlider.value = 0; // You can adjust the increment value as needed
-          sendButtonInput("throttle",0);
-          throttleSlider.dispatchEvent(new Event('input'));
-        }
-        if(event.keyCode === 65)
-        {
-          steeringSlider.value = 90; // You can adjust the increment value as needed
-          sendButtonInput("steering", 90);
-          steeringSlider.dispatchEvent(new Event('input'));
-        }
-        if(event.keyCode === 68)
-        {
-          steeringSlider.value = 90; // You can adjust the increment value as needed
-          sendButtonInput("steering", 90);
-          steeringSlider.dispatchEvent(new Event('input'));
-        }
+
         }
       
   
