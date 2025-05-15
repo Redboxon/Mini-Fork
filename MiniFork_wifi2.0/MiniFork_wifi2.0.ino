@@ -1,7 +1,6 @@
 // make sure to upload with ESP32 Dev Module selected as the board under tools>Board>ESP32 Arduino
 
 #include <Arduino.h>
-
 #include <ESP32Servo.h> // by Kevin Harrington
 #include <ESPAsyncWebSrv.h> // by dvarrel
 #include <iostream>
@@ -17,139 +16,55 @@
 // defines
 
 #define steeringServoPin 23
-#define mastTiltServoPin 22
-#define cabLights 32
-#define auxLights 33
+#define throttleServoPin 22
+#define auxAttach0 26  // currently unused, will be implemented in future
 
-#define mastMotor0 25  // Used for controlling auxiliary attachment movement
-#define mastMotor1 26  // Used for controlling auxiliary attachment movement
-#define auxAttach0 18  // Used for controlling auxiliary attachment movement
-#define auxAttach1 17  // Used for controlling auxiliary attachment movement
-
-#define leftMotor0 21   // Used for controlling the left motor movement
-#define leftMotor1 19   // Used for controlling the left motor movement
-#define rightMotor0 33  // Used for controlling the right motor movementc:\Users\JohnC\Desktop\SOLIDWORKS Connected.lnk
-#define rightMotor1 32  // Used for controlling the right motor movement
 
 // global constants
 
 extern const char* htmlHomePage PROGMEM;
-const char* ssid = "MiniFork";
+const char* ssid = "TableRacer_2"; //this Value will change the name of you ESP32's network
  
-// global variables
+
 
 Servo steeringServo;
-Servo mastTiltServo;
+Servo throttleServo;
 
-int servoDelay = 0;
+int steeringTrim = 8; //change this value in case your racer is not going straight
+int throttleTrim = -4;
+
+float throttleServoValue = 86;
 float steeringServoValue = 86;
-float steeringAdjustment = 1;
-int throttleValue = 0;
-int steeringTrim = 0;
-int mastTiltServoValue = 90;
-int mastTiltValue = 90;
-int lightSwitchTime = 0;
-bool horizontalScreen; // when screen orientation is locked vertically this rotates the D-Pad controls so that forward would now be left.
-bool lightsOn = false;
+int lightTimer = 0;
+bool lightIsOn = false;
 
 AsyncWebServer server(80);
 AsyncWebSocket wsCarInput("/CarInput");
 
 void steeringControl(int steeringValue)
 {
-  steeringServoValue = steeringValue;
-  steeringServo.write(steeringServoValue - steeringTrim);
-  if (steeringServoValue > 100) {
-    steeringAdjustment = ((200 - steeringServoValue) / 100);
-  } else if (steeringServoValue < 80) {
-    steeringAdjustment = ((200 - (90 + (90 - steeringServoValue))) / 100);
-  }
-  processThrottle(throttleValue);
+  steeringServoValue = 172- steeringValue - steeringTrim;
+  steeringServo.write(steeringServoValue);
 }
 
-void mastTiltControl(int mastTiltServoValue)
+void throttleControl(int throttleValue)
 {
-    mastTiltServo.write(mastTiltServoValue);
+  throttleServoValue = throttleValue - throttleTrim;
+  throttleServo.write(throttleServoValue);
 }
 
-void mastControl(int mastValue){
-if (mastValue == 5) {
-    digitalWrite(mastMotor0, HIGH);
-    digitalWrite(mastMotor1, LOW);
-  } else if (mastValue == 6) {
-    digitalWrite(mastMotor0, LOW);
-    digitalWrite(mastMotor1, HIGH);
-  } else {
-    digitalWrite(mastMotor0, LOW);
-    digitalWrite(mastMotor1, LOW);
-  }
-}
-void processThrottle(int throttle) {
-  throttleValue = throttle;
-  if (throttleValue > 15 || throttleValue < -15) {
-    if(steeringServoValue > 100) {
-      moveMotor(leftMotor0, leftMotor1, throttleValue * steeringAdjustment);
-      moveMotor(rightMotor0, rightMotor1, throttleValue);
-    } else if (steeringServoValue < 80) {
-      moveMotor(leftMotor0, leftMotor1, throttleValue);
-      moveMotor(rightMotor0, rightMotor1, throttleValue * steeringAdjustment);
-    } else {
-      moveMotor(leftMotor0, leftMotor1, throttleValue);
-      moveMotor(rightMotor0, rightMotor1, throttleValue);
-    }
-  } else {
-    moveMotor(leftMotor0, leftMotor1, 0);
-    moveMotor(rightMotor0, rightMotor1, 0);
-  }
-}
-void moveMotor(int motorPin1, int motorPin0, int velocity) {
-  if (velocity > 15) {
-    analogWrite(motorPin0, velocity);
-    analogWrite(motorPin1, LOW);
-  } else if (velocity < -15) {
-    analogWrite(motorPin0, LOW);
-    analogWrite(motorPin1, (-1 * velocity));
-  } else {
-    analogWrite(motorPin0, 0);
-    analogWrite(motorPin1, 0);
-  }
-}
 void lightControl()
 {
-  if ((millis() - lightSwitchTime) > 200) {
-    if (lightsOn) {
+  if ((millis() - lightTimer) > 200) {
+    if (lightIsOn) {
       digitalWrite(auxAttach0, LOW);
-      digitalWrite(auxAttach1, LOW);
-      lightsOn = false;
+      lightIsOn = false;
     } else {
       digitalWrite(auxAttach0, HIGH);
-      digitalWrite(auxAttach1, LOW);
-      lightsOn = true;
+      lightIsOn = true;
     }
 
-    lightSwitchTime = millis();
-  }
-}
-void mastTilt(int mastTilt)
-{
-   if (mastTilt == 1) {
-    if (servoDelay == 2) {
-      if (mastTiltValue >= 10 && mastTiltValue < 165) {
-        mastTiltValue = mastTiltValue + 2;
-        mastTiltServo.write(mastTiltValue);
-      }
-      servoDelay = 0;
-    }
-    servoDelay++;
-  } else {
-    if (servoDelay == 2) {
-      if (mastTiltValue <= 170 && mastTiltValue > 15) {
-        mastTiltValue = mastTiltValue - 2;
-        mastTiltServo.write(mastTiltValue);
-      }
-      servoDelay = 0;
-    }
-    servoDelay++;
+    lightTimer = millis();
   }
 }
 
@@ -197,19 +112,11 @@ void onCarInputWebSocketEvent(AsyncWebSocket *server,
         }
         else if (key == "throttle")
         {
-          processThrottle(valueInt);
-        }
-        else if (key == "mast")
-        {
-          mastControl(valueInt);
+          throttleControl(valueInt);
         }
         else if (key == "light")
         {
           lightControl();
-        }
-        else if (key == "mTilt")
-        {
-          mastTilt(valueInt);
         }
       }
       break;
@@ -223,26 +130,11 @@ void onCarInputWebSocketEvent(AsyncWebSocket *server,
 
 void setUpPinModes()
 {
-  pinMode(mastMotor0, OUTPUT);
-  pinMode(mastMotor1, OUTPUT);
-  pinMode(auxAttach0, OUTPUT);
-  pinMode(auxAttach1, OUTPUT);
-  pinMode(leftMotor0, OUTPUT);
-  pinMode(leftMotor1, OUTPUT);
-  pinMode(rightMotor0, OUTPUT);
-  pinMode(rightMotor1, OUTPUT);
-
-  digitalWrite(mastMotor0, LOW);
-  digitalWrite(mastMotor1, LOW);
-  digitalWrite(auxAttach0, LOW);
-  digitalWrite(auxAttach1, LOW);
-
   steeringServo.attach(steeringServoPin);
-  mastTiltServo.attach(mastTiltServoPin);
+  throttleServo.attach(throttleServoPin);
   steeringControl(steeringServoValue);
-  mastTiltControl(mastTiltServoValue);
+  throttleControl(throttleServoValue);
 }
-
 
 void setup(void)
 {
@@ -251,7 +143,7 @@ void setup(void)
 
   WiFi.softAP(ssid );
   IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
+  Serial.print("IP is ");
   Serial.println(IP);
 
   server.on("/", HTTP_GET, handleRoot);
@@ -259,9 +151,10 @@ void setup(void)
 
   wsCarInput.onEvent(onCarInputWebSocketEvent);
   server.addHandler(&wsCarInput);
-
+  
   server.begin();
-  //Serial.println("HTTP server started");
+  Serial.println("Server online");
+  Serial.end();
 }
 
 void loop()
