@@ -48,6 +48,10 @@ void steeringControl(int steeringValue)
   {
     steeringServoValue = 40;
   }
+ else if(steeringServoValue > 132)
+  {
+    steeringServoValue = 132;
+  }
   steeringServo.write(steeringServoValue);
 }
 
