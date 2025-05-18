@@ -44,6 +44,10 @@ AsyncWebSocket wsCarInput("/CarInput");
 void steeringControl(int steeringValue)
 {
   steeringServoValue = 172- steeringValue - steeringTrim;
+ if(steeringServoValue < 40)
+  {
+    steeringServoValue = 40;
+  }
   steeringServo.write(steeringServoValue);
 }
 
